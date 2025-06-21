@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>E-Learning Platform</title>
+  <style>
+    /* Reset & base */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f4f8;
+      color: #333;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+      background-color: #4a90e2;
+      color: white;
+      padding: 8px 16px;
+      transition: background-color 0.3s ease;
+      font-weight: 600;
+    }
+    button:hover {
+      background-color: #357abd;
+    }
+
+    /* Header */
+    header {
+      background-color: #1a73e8;
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 6px rgb(26 115 232 / 0.4);
+    }
+    header h1 {
+      margin: 0;
+      font-weight: 700;
+      font-size: 1.5rem;
+    }
+    nav a {
+      margin-left: 1rem;
+      font-weight: 600;
+      font-size: 1rem;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+    }
+    nav a:hover, nav a.active {
+      background-color: rgba(255 255 255 / 0.3);
+    }
+
+    /* Container for main content */
+    #app {
+      flex-grow: 1;
+      max-width: 960px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgb(0 0 0 / 0.1);
+      min-height: 60vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Course listing */
+    .course-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+    .course-card {
+      background: #fafafa;
+      border-radius: 8px;
+      padding: 1.5rem;
+      box-shadow: 0 3px 8px rgb(0 0 0 / 0.1);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.3s ease;
+    }
+    .course-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgb(0 0 0 / 0.15);
+    }
+    .course-title {
+      font-weight: 700;
+      font-size: 1.2rem;
+      margin-bottom: 0.7rem;
+    }
+    .course-description {
+      font-size: 0.95rem;
+      color: #666;
+      flex-grow: 1;
+      margin-bottom: 1rem;
+    }
+    .btn-view-course {
+      align-self: flex-start;
+      background-color: #34a853;
+    }
+    .btn-view-course:hover {
+      background-color: #2c8a42;
+    }
+
+    /* Progress tracking */
+    .progress-item {
+      padding: 0.7rem 0.8rem;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .progress-item:last-child {
+      border-bottom: none;
+    }
+    .progress-course-name {
+      font-weight: 600;
+      color: #1a73e8;
+    }
+    .progress-status {
+      font-size: 0.9rem;
+      color: #444;
+      font-weight: 600;
+    }
+
+    /* Course Detail */
+    #course-detail {
+      display: flex;
+      flex-direction: column;
+    }
+    #course-detail iframe {
+      width: 100%;
+      height: 360px;
+      border: none;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
+    }
+    #course-detail h2 {
+      margin: 0 0 0.5rem 0;
+      font-weight: 700;
+    }
+    #course-detail p {
+      font-size: 1rem;
+      color: #555;
+      margin-bottom: 1rem;
+    }
+    #btn-mark-complete {
+      align-self: flex-start;
+      background-color: #fbbc05;
+      color: #3b2f00;
+    }
+    #btn-mark-complete:hover {
+      background-color: #d4a303;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 600px) {
+      #course-detail iframe {
+        height: 220px;
+      }
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      nav a {
+        margin: 0.5rem 0 0 0;
+      }
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 1rem 2rem;
+      font-size: 0.9rem;
+      color: #777;
+      background: #f7f9fc;
+      border-top: 1px solid #ddd;
+      margin-top: auto;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>E-Learning Platform</h1>
+    <nav>
+      <a href="#" data-page="home" class="active">Courses</a>
+      <a href="#" data-page="progress">My Progress</a>
+    </nav>
+  </header>
+  <main id="app" role="main" aria-live="polite">
+    <!-- Dynamic content will be injected here -->
+  </main>
+  <footer>
+    &copy; 2024 E-Learning Platform. All rights reserved.
+  </footer>
+
+  <script>
+    (() => {
+      // Sample courses data
+      const courses = [
+        {
+          id: 'course1',
+          title: 'Introduction to JavaScript',
+          description: 'Learn the fundamentals of JavaScript, the programming language of the web.',
+          videoUrl: 'https://www.youtube.com/embed/W6NZfCO5SIk' // Sample
+        },
+        {
+          id: 'course2',
+          title: 'CSS for Beginners',
+          description: 'Understand how to style websites beautifully with modern CSS techniques.',
+          videoUrl: 'https://www.youtube.com/embed/yfoY53QXEnI'
+        },
+        {
+          id: 'course3',
+          title: 'HTML5 Basics',
+          description: 'Master the essentials of HTML5 to build well-structured websites.',
+          videoUrl: 'https://www.youtube.com/embed/UB1O30fR-EE'
+        },
+        {
+          id: 'course4',
+          title: 'React.js Fundamentals',
+          description: 'Get started with React.js and build reactive user interfaces with ease.',
+          videoUrl: 'https://www.youtube.com/embed/DLX62G4lc44'
+        }
+      ];
+
+      // State
+      let currentPage = 'home';
+      let currentCourseId = null;
+
+      // localStorage key for progress
+      const STORAGE_KEY = 'eLearningProgress';
+
+      // Load progress from localStorage
+      function loadProgress() {
+        const data = localStorage.getItem(STORAGE_KEY);
+        return data ? JSON.parse(data) : {};
+      }
+      // Save progress to localStorage
+      function saveProgress(progress) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+      }
+
+      // Render Functions
+
+      // Navigation active state update
+      function updateNavActive() {
+        document.querySelectorAll('nav a').forEach(anchor => {
+          anchor.classList.toggle('active', anchor.dataset.page === currentPage);
+        });
+      }
+
+      // Home page - courses listing
+      function renderHome() {
+        const app = document.getElementById('app');
+        app.innerHTML = '';
+
+        const heading = document.createElement('h2');
+        heading.textContent = 'Available Courses';
+        heading.style.marginBottom = '1rem';
+        app.appendChild(heading);
+
+        const courseList = document.createElement('div');
+        courseList.className = 'course-list';
+
+        const progress = loadProgress();
+
+        courses.forEach(course => {
+          const card = document.createElement('article');
+          card.className = 'course-card';
+          card.setAttribute('tabindex', 0);
+          card.setAttribute('role', 'button');
+          card.setAttribute('aria-pressed', 'false');
+          card.setAttribute('aria-label', `Course: ${course.title}`);
+
+          const title = document.createElement('h3');
+          title.className = 'course-title';
+          title.textContent = course.title;
+
+          const desc = document.createElement('p');
+          desc.className = 'course-description';
+          desc.textContent = course.description;
+
+          const btn = document.createElement('button');
+          btn.className = 'btn-view-course';
+          btn.textContent = 'View Course';
+          btn.addEventListener('click', () => {
+            currentCourseId = course.id;
+            currentPage = 'courseDetail';
+            render();
+          });
+
+          card.appendChild(title);
+          card.appendChild(desc);
+
+          if (progress[course.id]) {
+            const completedBadge = document.createElement('span');
+            completedBadge.textContent = '✓ Completed';
+            completedBadge.style.color = '#34a853';
+            completedBadge.style.fontWeight = '700';
+            completedBadge.style.marginBottom = '0.8rem';
+            card.insertBefore(completedBadge, desc);
+          }
+
+          card.appendChild(btn);
+          courseList.appendChild(card);
+        });
+        app.appendChild(courseList);
+      }
+
+      // Progress Page
+      function renderProgress() {
+        const app = document.getElementById('app');
+        app.innerHTML = '';
+
+        const heading = document.createElement('h2');
+        heading.textContent = 'My Progress';
+        heading.style.marginBottom = '1rem';
+        app.appendChild(heading);
+
+        const progress = loadProgress();
+        const completedCourses = courses.filter(course => progress[course.id]);
+
+        if (completedCourses.length === 0) {
+          const noProgress = document.createElement('p');
+          noProgress.textContent = 'You have not completed any courses yet.';
+          noProgress.style.fontWeight = '600';
+          noProgress.style.color = '#888';
+          app.appendChild(noProgress);
+          return;
+        }
+
+        const list = document.createElement('div');
+        completedCourses.forEach(course => {
+          const item = document.createElement('div');
+          item.className = 'progress-item';
+
+          const name = document.createElement('span');
+          name.className = 'progress-course-name';
+          name.textContent = course.title;
+
+          const status = document.createElement('span');
+          status.className = 'progress-status';
+          status.textContent = 'Completed';
+
+          item.appendChild(name);
+          item.appendChild(status);
+          list.appendChild(item);
+        });
+        app.appendChild(list);
+      }
+
+      // Course Detail Page
+      function renderCourseDetail() {
+        const app = document.getElementById('app');
+        app.innerHTML = '';
+
+        const course = courses.find(c => c.id === currentCourseId);
+        if (!course) {
+          app.textContent = 'Course not found.';
+          return;
+        }
+
+        const container = document.createElement('section');
+        container.id = 'course-detail';
+
+        const title = document.createElement('h2');
+        title.textContent = course.title;
+
+        const iframe = document.createElement('iframe');
+        iframe.src = course.videoUrl + '?rel=0&modestbranding=1';
+        iframe.title = `Video for course ${course.title}`;
+        iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+        iframe.allowFullscreen = true;
+
+        const desc = document.createElement('p');
+        desc.textContent = course.description;
+
+        const btn = document.createElement('button');
+        btn.id = 'btn-mark-complete';
+
+        const progress = loadProgress();
+        if (progress[course.id]) {
+          btn.textContent = 'Completed ✓';
+          btn.disabled = true;
+        } else {
+          btn.textContent = 'Mark as Completed';
+          btn.disabled = false;
+          btn.addEventListener('click', () => {
+            progress[course.id] = true;
+            saveProgress(progress);
+            btn.textContent = 'Completed ✓';
+            btn.disabled = true;
+            renderHome();
+          });
+        }
+
+        container.appendChild(title);
+        container.appendChild(iframe);
+        container.appendChild(desc);
+        container.appendChild(btn);
+
+        app.appendChild(container);
+      }
+
+      // Main render function
+      function render() {
+        updateNavActive();
+        switch (currentPage) {
+          case 'home':
+            renderHome();
+            break;
+          case 'progress':
+            renderProgress();
+            break;
+          case 'courseDetail':
+            renderCourseDetail();
+            break;
+          default:
+            renderHome();
+        }
+      }
+
+      // Navigation click handlers
+      document.querySelectorAll('nav a').forEach(navLink => {
+        navLink.addEventListener('click', (e) => {
+          e.preventDefault();
+          const page = navLink.dataset.page;
+          if (page) {
+            currentPage = page;
+            currentCourseId = null;
+            render();
+            // Focus main heading after page change for accessibility
+            const heading = document.querySelector('#app h2');
+            if (heading) heading.focus();
+          }
+        });
+      });
+
+      // Initial render on page load
+      render();
+    })();
+  </script>
+</body>
+</html>
+
